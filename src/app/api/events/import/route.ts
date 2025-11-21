@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       parsedDate = parsed.eventDate;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errorMessages = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+        const errorMessages = error.issues.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join(", ");
         return NextResponse.json(
           { error: `Validation failed: ${errorMessages}` },
           { status: 400 }
