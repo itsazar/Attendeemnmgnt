@@ -2,12 +2,9 @@
 
 // CRITICAL: Set engine type BEFORE any Prisma imports
 // This must happen at the very top of the file, before require()
-process.env.PRISMA_CLIENT_ENGINE_TYPE = process.env.PRISMA_CLIENT_ENGINE_TYPE || "binary";
-
-// Verify it's set (for debugging)
-if (process.env.PRISMA_CLIENT_ENGINE_TYPE !== "binary" && process.env.PRISMA_CLIENT_ENGINE_TYPE !== "library") {
-  throw new Error(`Invalid PRISMA_CLIENT_ENGINE_TYPE: ${process.env.PRISMA_CLIENT_ENGINE_TYPE}. Must be "binary" or "library"`);
-}
+const engineTypeEnv = process.env.PRISMA_CLIENT_ENGINE_TYPE?.toLowerCase();
+const prismaEngineType = engineTypeEnv === "library" ? "library" : "binary";
+process.env.PRISMA_CLIENT_ENGINE_TYPE = prismaEngineType;
 
 type PrismaClientConstructor = typeof import("@prisma/client").PrismaClient;
 const { PrismaClient }: { PrismaClient: PrismaClientConstructor } = require("@prisma/client");
@@ -19,6 +16,7 @@ export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    engineType: prismaEngineType,
   });
 
 if (process.env.NODE_ENV !== "production") {
