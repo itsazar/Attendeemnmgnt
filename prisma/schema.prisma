@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model BlocklistEntry {
+  id                 String      @id
+  participantId      String      @unique
+  firstNoShowEventId String?
+  firstNoShowAt      DateTime?
+  totalNoShows       Int         @default(1)
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime
+  Event              Event?      @relation(fields: [firstNoShowEventId], references: [id])
+  Participant        Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}
+
+model Event {
+  id               String             @id
+  name             String
+  eventDate        DateTime
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  BlocklistEntry   BlocklistEntry[]
+  EventParticipant EventParticipant[]
+  NoShowHistory    NoShowHistory[]
+}
+
+model EventParticipant {
+  id               String      @id
+  eventId          String
+  participantId    String
+  status           String      @default("CONFIRMED")
+  flaggedNoShow    Boolean     @default(false)
+  flaggedBlocklist Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime
+  Event            Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  Participant      Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, participantId])
+}
+
+model NoShowHistory {
+  id            String      @id
+  participantId String
+  eventId       String
+  recordedAt    DateTime    @default(now())
+  Event         Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  Participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+}
+
+model Participant {
+  id               String             @id
+  fullName         String
+  email            String             @unique
+  company          String?
+  city             String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  BlocklistEntry   BlocklistEntry?
+  EventParticipant EventParticipant[]
+  NoShowHistory    NoShowHistory[]
+}
+
+model attendees {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String?
+  email      String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
