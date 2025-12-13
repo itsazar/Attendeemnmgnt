@@ -2,22 +2,26 @@
 
 
 :root {
-  --bg: #f8f5ff;
-  --bg-secondary: #ffffff;
-  --card: rgba(255, 255, 255, 0.95);
-  --card-hover: #f0edff;
-  --border: #e6dbff;
-  --border-light: #d6c9ff;
-  --text: #1b1c45;
-  --text-secondary: #4c4e6f;
-  --muted: #7a7c9f;
-  --accent: #2dd4bf;
-  --accent-dark: #14b8a6;
-  --accent-gradient: linear-gradient(135deg, #2dd4bf 0%, #10b981 100%);
+  /* Gen Z-inspired palette */
+  --bg: #0f172a; /* deep slate */
+  --bg-secondary: #071028;
+  --card: rgba(255,255,255,0.03);
+  --card-hover: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.04);
+  --border-light: rgba(255,255,255,0.03);
+  --text: #e6eef8;
+  --text-secondary: #c7d2f7;
+  --muted: #9aa5d6;
+
+  --accent: #8b5cf6;
+  --accent-dark: #06b6d4;
+  --accent-gradient: linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);
+
   --danger: #ff4d6d;
   --warning: #ffb347;
-  --success: #2dd4bf;
-  --info: #38bdf8;
+  --success: #34d399;
+  --info: #60a5fa;
+
   font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -68,9 +72,9 @@ p {
   width: 280px;
   border-radius: 32px;
   padding: 2rem 1.5rem;
-  background: linear-gradient(180deg, #e89116 0%, #e89116 60%, #e89116 100%);
-  box-shadow: 0 25px 60px rgba(34, 7, 76, 0.5);
-  color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  box-shadow: 0 25px 60px rgba(2,6,20,0.6);
+  color: var(--text);
   display: flex;
   flex-direction: column;
   position: sticky;
@@ -81,6 +85,15 @@ p {
 .sidebar-header {
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Sidebar logo styling */
+.sidebar-header .sidebar-logo {
+  display: block;
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 0.5rem;
 }
 
 .sidebar-header h1 {
@@ -132,8 +145,8 @@ p {
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
-  box-shadow: 0 12px 25px rgba(8, 8, 28, 0.25);
+  background: var(--accent-gradient);
+  box-shadow: 0 12px 30px rgba(11,22,55,0.45);
   color: white;
 }
 
@@ -142,7 +155,7 @@ p {
   width: 5px;
   height: 60%;
   border-radius: 999px;
-  background: linear-gradient(180deg, #ff7ac0, #ffd17a);
+  background: var(--accent-gradient);
   position: absolute;
   left: -10px;
 }
@@ -176,11 +189,11 @@ p {
 
 .dashboard-content {
   flex: 1;
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 38px;
+  background: linear-gradient(180deg, rgba(8,10,20,0.55), rgba(6,9,20,0.45));
+  border-radius: 28px;
   padding: 2.5rem;
-  box-shadow: 0 30px 80px rgba(18, 7, 49, 0.12);
-  backdrop-filter: blur(18px);
+  box-shadow: 0 30px 80px rgba(2,6,20,0.6);
+  backdrop-filter: blur(8px);
 }
 
 .page {
@@ -266,31 +279,71 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
   margin-top: 0.5rem;
-  border-radius: 16px;
-  border: 1px solid var(--border);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.04);
   padding: 0.85rem 1rem;
   font-size: 0.95rem;
-  background: #fdfbff;
+  background: rgba(255,255,255,0.02);
   color: var(--text);
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 input:focus,
-select:focus {
+select:focus,
+textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(110, 70, 255, 0.15);
+  box-shadow: 0 0 0 6px rgba(139,92,246,0.08);
 }
 
-input::placeholder {
-  color: var(--muted);
+input::placeholder,
+textarea::placeholder {
+  color: rgba(199,210,255,0.35);
 }
 
 input[type="file"] {
   padding: 0.6rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+}
+
+/* Stronger, higher-specificity overrides to ensure fields are dark across all tabs */
+.dashboard-content input,
+.dashboard-content select,
+.dashboard-content textarea,
+.section input,
+.section select,
+.section textarea {
+  background: rgba(255,255,255,0.02) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(255,255,255,0.04) !important;
+}
+
+.dashboard-content input::placeholder,
+.dashboard-content textarea::placeholder,
+.section input::placeholder,
+.section textarea::placeholder {
+  color: rgba(199,210,255,0.35) !important;
+}
+
+/* Date and native controls (WebKit/Chrome) */
+.dashboard-content input[type="date"],
+.dashboard-content input[type="time"] {
+  background: rgba(255,255,255,0.02) !important;
+  color: var(--text) !important;
+}
+
+/* File input wrapper: keep button readable */
+.dashboard-content input[type="file"]::file-selector-button {
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border: none;
+  padding: 6px 10px;
+  margin-right: 8px;
 }
 
 button {
@@ -430,9 +483,9 @@ tbody tr:hover {
   flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem;
-  background: #f4f0ff;
-  border-radius: 18px;
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 header {
@@ -517,9 +570,9 @@ header h1 {
   align-items: center;
   gap: 1rem;
   padding: 0.85rem 1rem;
-  border-radius: 16px;
-  background: #f8f6ff;
-  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
 .chart-pie-color {
@@ -580,6 +633,28 @@ ul li {
   font-size: 2rem;
 }
 
+/* Logo shown on the login card instead of text */
+.login-header .login-logo {
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.75rem;
+  border-radius: 12px;
+  background: transparent;
+}
+
+.login-logo-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 160px;
+  height: 62px;
+  margin: 0 auto 0.75rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;
@@ -590,8 +665,29 @@ ul li {
   border-radius: 16px;
   border: 1px solid var(--border);
   padding: 0.85rem 1rem;
-  background: #fdfbff;
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.04);
 }
+/* Per-tab accent overrides */
+.dashboard-content.tab-dashboard { --accent: #8b5cf6; --accent-dark: #06b6d4; --accent-gradient: linear-gradient(135deg,#8b5cf6 0%,#06b6d4 100%);} 
+.dashboard-content.tab-import { --accent: #06b6d4; --accent-dark: #7c3aed; --accent-gradient: linear-gradient(135deg,#06b6d4 0%,#7c3aed 100%);} 
+.dashboard-content.tab-events { --accent: #ff6bcb; --accent-dark: #ffb86b; --accent-gradient: linear-gradient(135deg,#ff6bcb 0%,#ffd166 100%);} 
+.dashboard-content.tab-history { --accent: #34d399; --accent-dark: #60a5fa; --accent-gradient: linear-gradient(135deg,#34d399 0%,#60a5fa 100%);} 
+.dashboard-content.tab-blocklist { --accent: #ff7ab6; --accent-dark: #ffb86b; --accent-gradient: linear-gradient(135deg,#ff7ab6 0%,#ffb86b 100%);} 
+.dashboard-content.tab-volunteers { --accent: #7c3aed; --accent-dark: #06b6d4; --accent-gradient: linear-gradient(135deg,#7c3aed 0%,#06b6d4 100%);} 
+
+/* Sidebar per-tab gradients */
+.sidebar.tab-dashboard { background: linear-gradient(180deg, rgba(124,58,237,0.95), rgba(6,182,212,0.9)); color: #ffffff; }
+.sidebar.tab-import { background: linear-gradient(180deg, rgba(6,182,212,0.95), rgba(124,58,237,0.9)); color: #ffffff; }
+.sidebar.tab-events { background: linear-gradient(180deg, rgba(255,107,203,0.92), rgba(255,209,102,0.9)); color: #ffffff; }
+.sidebar.tab-history { background: linear-gradient(180deg, rgba(52,211,153,0.95), rgba(96,165,250,0.9)); color: #ffffff; }
+.sidebar.tab-blocklist { background: linear-gradient(180deg, rgba(255,122,182,0.95), rgba(255,184,107,0.9)); color: #ffffff; }
+.sidebar.tab-volunteers { background: linear-gradient(180deg, rgba(124,58,237,0.95), rgba(6,182,212,0.9)); color: #ffffff; }
+.sidebar .nav-item { background: transparent; color: rgba(255,255,255,0.95); }
+.sidebar .nav-item:hover { background: rgba(255,255,255,0.06); transform: translateX(4px); }
+.sidebar .nav-item.active { background: rgba(255,255,255,0.14); color: white; }
+.sidebar .logout-button { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
 
 .login-button {
   width: 100%;

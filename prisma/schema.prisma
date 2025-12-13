@@ -73,3 +73,13 @@ model attendees {
   email      String?
   created_at DateTime? @default(now()) @db.Timestamptz(6)
 }
+
+model Volunteer {
+  id          String   @id
+  name        String
+  phoneNumber String?
+  email       String?  @unique
+  joinedAt    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+}

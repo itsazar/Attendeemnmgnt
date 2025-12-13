@@ -1,19 +1,36 @@
+/**
+ * demoattendee — src/app/api/overview/route.ts
+ *
+ * Brief: API route returning dashboard summary (counts, event history, blocklist).
+ */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+/** GET /api/overview - returns dashboard data */
 export async function GET() {
   try {
     console.log("API /overview called");
-    const [participantCount, attendedCount, noShowCount, blocklistCount, eventCount] =
-      await Promise.all([
-        prisma.participant.count(),
-        prisma.eventParticipant.count({ where: { status: "ATTENDED" } }),
-        prisma.eventParticipant.count({ where: { status: "NO_SHOW" } }),
-        prisma.blocklistEntry.count(),
-        prisma.event.count(),
-      ]);
-    
-    console.log("Counts:", { participantCount, attendedCount, noShowCount, blocklistCount, eventCount });
+    const [
+      participantCount,
+      attendedCount,
+      noShowCount,
+      blocklistCount,
+      eventCount,
+    ] = await Promise.all([
+      prisma.participant.count(),
+      prisma.eventParticipant.count({ where: { status: "ATTENDED" } }),
+      prisma.eventParticipant.count({ where: { status: "NO_SHOW" } }),
+      prisma.blocklistEntry.count(),
+      prisma.event.count(),
+    ]);
+
+    console.log("Counts:", {
+      participantCount,
+      attendedCount,
+      noShowCount,
+      blocklistCount,
+      eventCount,
+    });
 
     const events = await prisma.event.findMany({
       orderBy: { eventDate: "desc" },
@@ -32,13 +49,15 @@ export async function GET() {
     const eventHistory = events.map((event: EventRecord) => {
       const totalParticipants = event.EventParticipant.length;
       const attended = event.EventParticipant.filter(
-        (participant: EventParticipantRecord) => participant.status === "ATTENDED"
+        (participant: EventParticipantRecord) =>
+          participant.status === "ATTENDED",
       ).length;
       const noShows = event.EventParticipant.filter(
-        (participant: EventParticipantRecord) => participant.status === "NO_SHOW"
+        (participant: EventParticipantRecord) =>
+          participant.status === "NO_SHOW",
       ).length;
       const flagged = event.EventParticipant.filter(
-        (participant: EventParticipantRecord) => participant.flaggedBlocklist
+        (participant: EventParticipantRecord) => participant.flaggedBlocklist,
       ).length;
 
       return {
@@ -88,7 +107,9 @@ export async function GET() {
 
     const totalConsidered = attendedCount + noShowCount;
     const noShowPercentage =
-      totalConsidered === 0 ? 0 : Number(((noShowCount / totalConsidered) * 100).toFixed(2));
+      totalConsidered === 0
+        ? 0
+        : Number(((noShowCount / totalConsidered) * 100).toFixed(2));
 
     const response = {
       summary: {
@@ -103,26 +124,31 @@ export async function GET() {
       noShowHistory,
       blocklist,
     };
-    
+
     console.log("Response prepared:", JSON.stringify(response, null, 2));
     return NextResponse.json(response);
   } catch (error) {
     console.error("Error in /api/overview:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unable to load dashboard data";
+    const errorMessage =
+      error instanceof Error ? error.message : "Unable to load dashboard data";
     const errorStack = error instanceof Error ? error.stack : undefined;
     console.error("Error stack:", errorStack);
-    
+
     // Check if it's a database connection error
-    if (errorMessage.includes("DATABASE_URL") || errorMessage.includes("connection") || errorMessage.includes("P1001") || errorMessage.includes("P1000")) {
+    if (
+      errorMessage.includes("DATABASE_URL") ||
+      errorMessage.includes("connection") ||
+      errorMessage.includes("P1001") ||
+      errorMessage.includes("P1000")
+    ) {
       return NextResponse.json(
-        { error: "Database connection failed. Please check your DATABASE_URL environment variable." },
-        { status: 500 }
+        {
+          error:
+            "Database connection failed. Please check your DATABASE_URL environment variable.",
+        },
+        { status: 500 },
       );
     }
-    return NextResponse.json(
-      { error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
-

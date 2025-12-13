@@ -1,6 +1,15 @@
+/**
+ * demoattendee — src/middleware.ts
+ *
+ * Brief: Middleware used to guard routes and redirect unauthenticated users.
+ */
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+/**
+ * Middleware that checks authentication cookie and redirects as needed.
+ * @param {NextRequest} request Incoming Next.js request
+ */
 export function middleware(request: NextRequest) {
   const authToken = request.cookies.get("auth-token");
   const { pathname } = request.nextUrl;
@@ -28,6 +37,9 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
+/**
+ * Middleware configuration (path matcher).
+ */
 export const config = {
   matcher: [
     /*
@@ -40,4 +52,3 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-

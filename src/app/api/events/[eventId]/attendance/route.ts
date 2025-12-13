@@ -1,9 +1,15 @@
+/**
+ * demoattendee — src/app/api/events/[eventId]/attendance/route.ts
+ *
+ * Brief: Accept attendance Excel uploads (attended/no-show/blocklisted) and record them.
+ */
 import type { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { parseParticipantWorkbook } from "@/lib/excel";
 import { randomUUID } from "crypto";
 
+/** Summary returned by attendance endpoint */
 type AttendanceSummary = {
   totalAttendedMarked: number;
   totalNoShowsMarked: number;
@@ -13,7 +19,7 @@ type AttendanceSummary = {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ eventId: string }> }
+  { params }: { params: Promise<{ eventId: string }> },
 ) {
   try {
     const { eventId } = await params;
@@ -22,10 +28,14 @@ export async function POST(
     const noShowFile = formData.get("noShowFile");
     const blocklistedFile = formData.get("blocklistedFile");
 
-    if (!(attendedFile instanceof File) && !(noShowFile instanceof File) && !(blocklistedFile instanceof File)) {
+    if (
+      !(attendedFile instanceof File) &&
+      !(noShowFile instanceof File) &&
+      !(blocklistedFile instanceof File)
+    ) {
       return NextResponse.json(
         { error: "Please upload at least one attendance file" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -36,7 +46,9 @@ export async function POST(
 
     const attendedRows =
       attendedFile instanceof File
-        ? parseParticipantWorkbook(Buffer.from(await attendedFile.arrayBuffer()))
+        ? parseParticipantWorkbook(
+            Buffer.from(await attendedFile.arrayBuffer()),
+          )
         : [];
     const noShowRows =
       noShowFile instanceof File
@@ -44,20 +56,24 @@ export async function POST(
         : [];
     const blocklistedRows =
       blocklistedFile instanceof File
-        ? parseParticipantWorkbook(Buffer.from(await blocklistedFile.arrayBuffer()))
+        ? parseParticipantWorkbook(
+            Buffer.from(await blocklistedFile.arrayBuffer()),
+          )
         : [];
 
     if (!attendedRows.length && !noShowRows.length && !blocklistedRows.length) {
       return NextResponse.json(
         { error: "Uploaded files do not contain any participants" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const attendedEmails = new Set(attendedRows.map((row) => row.email));
     const noShowEmails = new Set(noShowRows.map((row) => row.email));
     const blocklistedEmails = new Set(blocklistedRows.map((row) => row.email));
-    const allEmails = Array.from(new Set([...attendedEmails, ...noShowEmails, ...blocklistedEmails]));
+    const allEmails = Array.from(
+      new Set([...attendedEmails, ...noShowEmails, ...blocklistedEmails]),
+    );
 
     const participants = await prisma.participant.findMany({
       where: { email: { in: allEmails } },
@@ -104,7 +120,9 @@ export async function POST(
 
         await ensureEventParticipant(participant.id);
         await tx.eventParticipant.update({
-          where: { eventId_participantId: { eventId, participantId: participant.id } },
+          where: {
+            eventId_participantId: { eventId, participantId: participant.id },
+          },
           data: {
             status: "ATTENDED",
             flaggedNoShow: false,
@@ -125,7 +143,9 @@ export async function POST(
 
         await ensureEventParticipant(participant.id);
         await tx.eventParticipant.update({
-          where: { eventId_participantId: { eventId, participantId: participant.id } },
+          where: {
+            eventId_participantId: { eventId, participantId: participant.id },
+          },
           data: {
             status: "NO_SHOW",
             flaggedNoShow: true,
@@ -197,7 +217,9 @@ export async function POST(
 
           // Mark as blocklisted in event participant
           await tx.eventParticipant.update({
-            where: { eventId_participantId: { eventId, participantId: participant.id } },
+            where: {
+              eventId_participantId: { eventId, participantId: participant.id },
+            },
             data: {
               flaggedBlocklist: true,
               updatedAt: new Date(),
@@ -215,10 +237,12 @@ export async function POST(
         }
 
         await ensureEventParticipant(participant.id);
-        
+
         // Mark as blocklisted in event participant
         await tx.eventParticipant.update({
-          where: { eventId_participantId: { eventId, participantId: participant.id } },
+          where: {
+            eventId_participantId: { eventId, participantId: participant.id },
+          },
           data: {
             flaggedBlocklist: true,
             updatedAt: new Date(),
@@ -261,9 +285,13 @@ export async function POST(
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to record attendance" },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to record attendance",
+      },
+      { status: 500 },
     );
   }
 }
-

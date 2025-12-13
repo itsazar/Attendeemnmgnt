@@ -1,7 +1,13 @@
+/**
+ * demoattendee — src/app/api/export/blocklist/route.ts
+ *
+ * Brief: Export blocklisted participants as an Excel workbook.
+ */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { buildWorkbookFromRows, bufferToArrayBuffer } from "@/lib/excel";
 
+/** GET /api/export/blocklist */
 export async function GET() {
   try {
     const entries = await prisma.blocklistEntry.findMany({
@@ -41,10 +47,10 @@ export async function GET() {
     console.error(error);
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Unable to export blocklist",
+        error:
+          error instanceof Error ? error.message : "Unable to export blocklist",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

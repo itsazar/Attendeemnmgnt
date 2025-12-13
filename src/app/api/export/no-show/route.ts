@@ -1,8 +1,14 @@
+/**
+ * demoattendee — src/app/api/export/no-show/route.ts
+ *
+ * Brief: Export no-show report and related cross-event history.
+ */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { buildWorkbook, bufferToArrayBuffer } from "@/lib/excel";
 import { exportConfirmedSchema } from "@/lib/validators";
 
+/** POST /api/export/no-show */
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
@@ -25,7 +31,7 @@ export async function POST(request: Request) {
     type EventParticipantRecord = (typeof event.EventParticipant)[number];
 
     const participantIds = event.EventParticipant.map(
-      (participant: EventParticipantRecord) => participant.participantId
+      (participant: EventParticipantRecord) => participant.participantId,
     );
 
     const crossEventHistory = participantIds.length
@@ -36,14 +42,16 @@ export async function POST(request: Request) {
         })
       : [];
 
-    const eventRows = event.EventParticipant.map((participant: EventParticipantRecord) => ({
-      "Full Name": participant.Participant.fullName,
-      Email: participant.Participant.email,
-      Company: participant.Participant.company ?? "",
-      City: participant.Participant.city ?? "",
-      "Event Name": event.name,
-      "Event Date": event.eventDate.toISOString().split("T")[0],
-    }));
+    const eventRows = event.EventParticipant.map(
+      (participant: EventParticipantRecord) => ({
+        "Full Name": participant.Participant.fullName,
+        Email: participant.Participant.email,
+        Company: participant.Participant.company ?? "",
+        City: participant.Participant.city ?? "",
+        "Event Name": event.name,
+        "Event Date": event.eventDate.toISOString().split("T")[0],
+      }),
+    );
 
     type NoShowHistoryRecord = (typeof crossEventHistory)[number];
 
@@ -75,9 +83,13 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to export no-show report" },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to export no-show report",
+      },
+      { status: 500 },
     );
   }
 }
-

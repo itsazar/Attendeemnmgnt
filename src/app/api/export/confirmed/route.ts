@@ -1,8 +1,14 @@
+/**
+ * demoattendee — src/app/api/export/confirmed/route.ts
+ *
+ * Brief: Export confirmed participants for an event as an Excel workbook.
+ */
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { buildWorkbookFromRows, bufferToArrayBuffer } from "@/lib/excel";
 import { exportConfirmedSchema } from "@/lib/validators";
 
+/** POST /api/export/confirmed */
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
@@ -26,7 +32,7 @@ export async function POST(request: Request) {
 
     const filtered = event.EventParticipant.filter(
       (participant: EventParticipantRecord) =>
-        !participant.flaggedBlocklist && !participant.flaggedNoShow
+        !participant.flaggedBlocklist && !participant.flaggedNoShow,
     );
 
     const rows = filtered.map((participant: EventParticipantRecord) => ({
@@ -50,9 +56,13 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unable to export confirmed list" },
-      { status: 500 }
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to export confirmed list",
+      },
+      { status: 500 },
     );
   }
 }
-

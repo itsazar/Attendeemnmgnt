@@ -1,14 +1,21 @@
+/**
+ * demoattendee — src/app/login/page.tsx
+ *
+ * Brief: Login page component for administrators.
+ */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+/** Login page UI and submit handler. */
 export default function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +51,21 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>Event Management</h1>
+          {!logoError ? (
+            <img
+              src="/assets/logo.png"
+              alt="VolunteerGelp"
+              className="login-logo"
+              onError={() => setLogoError(true)}
+            />
+          ) : (
+            <div className="login-logo-fallback" aria-hidden>
+              <svg width="140" height="54" viewBox="0 0 280 108" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VolunteerGelp logo">
+                <rect rx="12" width="280" height="108" fill="rgba(255,255,255,0.02)"/>
+                <text x="50%" y="55%" dominantBaseline="middle" textAnchor="middle" fill="white" fontFamily="Inter, system-ui, -apple-system, 'Segoe UI', Roboto" fontWeight="700" fontSize="28">VolunteerGelp</text>
+              </svg>
+            </div>
+          )}
           <p className="muted">Admin Login</p>
         </div>
 
@@ -88,4 +109,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

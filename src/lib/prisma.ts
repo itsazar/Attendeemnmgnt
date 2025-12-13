@@ -1,3 +1,8 @@
+/**
+ * demoattendee — src/lib/prisma.ts
+ *
+ * Brief: Prisma client bootstrap. Ensures engine type is set before importing.
+ */
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 // CRITICAL: Set engine type BEFORE any Prisma imports
@@ -7,15 +12,25 @@ const prismaEngineType = engineTypeEnv === "library" ? "library" : "binary";
 process.env.PRISMA_CLIENT_ENGINE_TYPE = prismaEngineType;
 
 type PrismaClientConstructor = typeof import("@prisma/client").PrismaClient;
-const { PrismaClient }: { PrismaClient: PrismaClientConstructor } = require("@prisma/client");
+const {
+  PrismaClient,
+}: { PrismaClient: PrismaClientConstructor } = require("@prisma/client");
 type PrismaClientInstance = InstanceType<PrismaClientConstructor>;
 
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientInstance };
+const globalForPrisma = globalThis as unknown as {
+  prisma?: PrismaClientInstance;
+};
 
+/**
+ * Shared Prisma client instance (singleton in dev to avoid hot-reload instances).
+ */
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
   });
 
 if (process.env.NODE_ENV !== "production") {
@@ -23,4 +38,3 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 export default prisma;
-
