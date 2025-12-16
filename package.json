@@ -19,7 +19,7 @@
     "@supabase/supabase-js": "^2.84.0",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
-    "next": "16.0.3",
+    "next": "16.0.10",
     "prisma": "^5.19.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
