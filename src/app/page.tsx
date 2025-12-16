@@ -198,7 +198,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "import" | "events" | "history" | "blocklist" | "volunteers"
   >("dashboard");
-  const [blocklistView, setBlocklistView] = useState<"list" | "volunteers">("list");
+
 
   const refreshOverview = useCallback(async () => {
     try {
@@ -809,7 +809,7 @@ export default function Home() {
                           });
 
                           if (allParticipants.length === 0) {
-                            alert("No participants to export");
+                            setError("No participants to export");
                             return;
                           }
 
@@ -831,7 +831,7 @@ export default function Home() {
                             URL.revokeObjectURL(objectUrl);
                           } catch (error) {
                             console.error("Export error:", error);
-                            alert(
+                            setError(
                               "Failed to export participants. Check console for details.",
                             );
                           }

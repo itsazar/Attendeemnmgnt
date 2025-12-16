@@ -50,11 +50,32 @@ export default function Volunteers() {
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return setError("Name is required");
-    // Basic email validation
-    if (email && !/^\S+@\S+\.\S+$/.test(email.trim())) return setError("Email is invalid");
+    if (!name.trim()) {
+      setError("Name is required");
+      return;
+    }
+    if (phoneNumber && !/^[0-9+()\-\s]{6,20}$/.test(phoneNumber.trim())) {
+      setError("Phone number must be 6-20 characters and contain only digits, spaces, dashes, parentheses, or plus signs.");
+      return;
+    }
+      const trimmedName = name.trim();
+      const trimmedPhoneNumber = phoneNumber.trim() || null;
+      const trimmedEmail = email.trim() || null;
+      const finalJoinedAt = joinedAt || undefined;
+      const payload = {
+        name: trimmedName,
+        phoneNumber: trimmedPhoneNumber,
+        email: trimmedEmail,
+        joinedAt: finalJoinedAt,
+      };
+      setError("Please enter a valid email address (e.g., user@example.com)");
+      return;
+    }
     // Basic phone validation (digits, spaces, dashes allowed)
-    if (phoneNumber && !/^[0-9+()\-\s]{6,20}$/.test(phoneNumber.trim())) return setError("Phone number looks invalid");
+    if (phoneNumber && !/^[0-9+()\-\s]{6,20}$/.test(phoneNumber.trim())) {
+      setError("Phone number must be 6-20 characters and contain only digits, spaces, dashes, parentheses, or plus signs.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -111,7 +132,7 @@ export default function Volunteers() {
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{ flex: 1 }}
         />
-        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as any)}>
+        <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value as "newest" | "oldest")}>
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
         </select>

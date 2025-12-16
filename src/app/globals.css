@@ -312,22 +312,22 @@ input[type="file"] {
 }
 
 /* Stronger, higher-specificity overrides to ensure fields are dark across all tabs */
-.dashboard-content input,
-.dashboard-content select,
-.dashboard-content textarea,
-.section input,
-.section select,
-.section textarea {
-  background: rgba(255,255,255,0.02) !important;
-  color: var(--text) !important;
-  border: 1px solid rgba(255,255,255,0.04) !important;
+.dashboard-content.dashboard-content input,
+.dashboard-content.dashboard-content select,
+.dashboard-content.dashboard-content textarea,
+.section.section input,
+.section.section select,
+.section.section textarea {
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.04);
 }
 
-.dashboard-content input::placeholder,
-.dashboard-content textarea::placeholder,
-.section input::placeholder,
-.section textarea::placeholder {
-  color: rgba(199,210,255,0.35) !important;
+.dashboard-content.dashboard-content input::placeholder,
+.dashboard-content.dashboard-content textarea::placeholder,
+.section.section input::placeholder,
+.section.section textarea::placeholder {
+  color: rgba(199,210,255,0.35);
 }
 
 /* Date and native controls (WebKit/Chrome) */
