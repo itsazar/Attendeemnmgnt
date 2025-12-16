@@ -809,7 +809,7 @@ export default function Home() {
                           });
 
                           if (allParticipants.length === 0) {
-                            setError("No participants to export");
+                            setOverviewError("No participants to export");
                             return;
                           }
 
@@ -831,7 +831,7 @@ export default function Home() {
                             URL.revokeObjectURL(objectUrl);
                           } catch (error) {
                             console.error("Export error:", error);
-                            setError(
+                            setOverviewError(
                               "Failed to export participants. Check console for details.",
                             );
                           }
