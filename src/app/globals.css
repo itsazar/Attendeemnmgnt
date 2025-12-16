@@ -71,7 +71,7 @@ p {
 .sidebar {
   width: 280px;
   border-radius: 32px;
-  padding: 2rem 1.5rem;
+  padding: 1.25rem 1rem;
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
   box-shadow: 0 25px 60px rgba(2,6,20,0.6);
   color: var(--text);
@@ -90,10 +90,17 @@ p {
 /* Sidebar logo styling */
 .sidebar-header .sidebar-logo {
   display: block;
-  max-width: 180px;
+  max-width: 140px;
   width: 100%;
+  max-height: 90px;
   height: auto;
+  object-fit: contain;
   margin-bottom: 0.5rem;
+}
+
+/* Reduce header text to save vertical space in sidebar */
+.sidebar-header .muted {
+  display: none;
 }
 
 .sidebar-header h1 {

@@ -7,6 +7,7 @@ type Volunteer = {
   name: string;
   phoneNumber?: string | null;
   email?: string | null;
+  comments?: string | null;
   joinedAt: string;
 };
 
@@ -22,6 +23,7 @@ export default function Volunteers() {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [email, setEmail] = useState("");
+  const [comments, setComments] = useState("");
   const [joinedAt, setJoinedAt] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -54,32 +56,22 @@ export default function Volunteers() {
       setError("Name is required");
       return;
     }
-    if (phoneNumber && !/^[0-9+()\-\s]{6,20}$/.test(phoneNumber.trim())) {
-      setError("Phone number must be 6-20 characters and contain only digits, spaces, dashes, parentheses, or plus signs.");
-      return;
-    }
-      const trimmedName = name.trim();
-      const trimmedPhoneNumber = phoneNumber.trim() || null;
-      const trimmedEmail = email.trim() || null;
-      const finalJoinedAt = joinedAt || undefined;
-      const payload = {
-        name: trimmedName,
-        phoneNumber: trimmedPhoneNumber,
-        email: trimmedEmail,
-        joinedAt: finalJoinedAt,
-      };
-      setError("Please enter a valid email address (e.g., user@example.com)");
-      return;
-    }
     // Basic phone validation (digits, spaces, dashes allowed)
     if (phoneNumber && !/^[0-9+()\-\s]{6,20}$/.test(phoneNumber.trim())) {
       setError("Phone number must be 6-20 characters and contain only digits, spaces, dashes, parentheses, or plus signs.");
       return;
     }
+
+    // Basic email validation if provided
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError("Please enter a valid email address (e.g., user@example.com)");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
     try {
-      const payload = { name: name.trim(), phoneNumber: phoneNumber.trim() || null, email: email.trim() || null, joinedAt: joinedAt || undefined };
+      const payload = { name: name.trim(), phoneNumber: phoneNumber.trim() || null, email: email.trim() || null, comments: comments.trim() || null, joinedAt: joinedAt || undefined };
       const res = await fetch("/api/blocklist/volunteers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +88,7 @@ export default function Volunteers() {
       setName("");
       setPhoneNumber("");
       setEmail("");
+      setComments("");
       setJoinedAt("");
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -111,6 +104,28 @@ export default function Volunteers() {
       if (!res.ok) throw new Error("Failed to remove volunteer");
       setVolunteers((s) => s.filter((v) => v.id !== id));
       setSuccess("Volunteer removed");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleModify = async (id: string, currentComments: string) => {
+    const newComments = prompt("Edit comments:", currentComments ?? "");
+    if (newComments === null) return; // cancelled
+    try {
+      const res = await fetch(`/api/blocklist/volunteers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comments: newComments }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || "Failed to update volunteer");
+      }
+      const updated = await res.json();
+      setVolunteers((s) => s.map((v) => (v.id === id ? updated : v)));
+      setSuccess("Volunteer updated");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -141,17 +156,18 @@ export default function Volunteers() {
       <div className="table-wrapper" ref={tableRef}>
         <table>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Joined</th>
-              <th />
-            </tr>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Comments</th>
+                  <th>Joined</th>
+                  <th />
+                </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={5}>Loading...</td></tr>
+              <tr><td colSpan={6}>Loading...</td></tr>
             ) : (() => {
               const q = searchTerm.trim().toLowerCase();
               const filtered = volunteers.filter((v) => {
@@ -175,14 +191,16 @@ export default function Volunteers() {
                     <td>{v.name}</td>
                     <td>{v.phoneNumber ?? "—"}</td>
                     <td>{v.email ?? "—"}</td>
+                    <td style={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.comments ?? "—"}</td>
                     <td>{new Date(v.joinedAt).toLocaleDateString()}</td>
                     <td>
+                      <button style={{ marginRight: 8 }} className="secondary-btn" onClick={() => handleModify(v.id, v.comments ?? "")}>Modify</button>
                       <button className="danger" onClick={() => handleRemove(v.id)}>Remove</button>
                     </td>
                   </tr>
                 ))
               ) : (
-                <tr><td colSpan={5}>No volunteers found</td></tr>
+                <tr><td colSpan={6}>No volunteers found</td></tr>
               );
             })()}
           </tbody>
@@ -207,6 +225,7 @@ export default function Volunteers() {
         <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
         <input placeholder="Phone number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
         <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input placeholder="Comments" value={comments} onChange={(e) => setComments(e.target.value)} />
         <input type="date" placeholder="Joined at" value={joinedAt} onChange={(e) => setJoinedAt(e.target.value)} />
         <button type="submit" disabled={submitting}>{submitting ? "Adding..." : "Add Volunteer"}</button>
       </form>

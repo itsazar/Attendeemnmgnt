@@ -16,7 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const payload = await request.json();
-    const { name, phoneNumber, email, joinedAt } = payload;
+    const { name, phoneNumber, email, joinedAt, comments } = payload;
     if (!name || typeof name !== "string") {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         phoneNumber: phoneNumber ? String(phoneNumber).trim() : null,
         email: email ? String(email).trim().toLowerCase() : null,
         joinedAt: joinedAt ? new Date(joinedAt) : now,
+        comments: comments ? String(comments).trim() : null,
         updatedAt: now,
       },
     });

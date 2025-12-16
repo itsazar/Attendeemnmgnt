@@ -43,3 +43,31 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     return NextResponse.json({ error: error?.message || "Failed to remove volunteer" }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params;
+    const body = await request.json().catch(() => ({}));
+    if (!id) {
+      return NextResponse.json({ error: "Missing volunteer id" }, { status: 400 });
+    }
+
+    const updates: any = {};
+    if (typeof body.name === "string") updates.name = body.name.trim();
+    if ("phoneNumber" in body) updates.phoneNumber = body.phoneNumber ? String(body.phoneNumber).trim() : null;
+    if ("email" in body) updates.email = body.email ? String(body.email).trim().toLowerCase() : null;
+    if ("joinedAt" in body && body.joinedAt) updates.joinedAt = new Date(body.joinedAt);
+    if ("comments" in body) updates.comments = body.comments ? String(body.comments).trim() : null;
+    updates.updatedAt = new Date();
+
+    const updated = await prisma.volunteer.update({ where: { id }, data: updates });
+    return NextResponse.json(updated);
+  } catch (err) {
+    const error = err as any;
+    if (error?.code === "P2025") {
+      return NextResponse.json({ error: "Volunteer not found" }, { status: 404 });
+    }
+    console.error("Error updating volunteer:", err);
+    return NextResponse.json({ error: error?.message || "Failed to update volunteer" }, { status: 500 });
+  }
+}
